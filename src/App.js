@@ -20,9 +20,20 @@ function App() {
 
   useEffect(() => {
     const winner = checkWinner();
+    const noneEmpty = (arr) => {
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === "") return false;
+      }
+      return true;
+    };
     if (winner) {
       setTimeout(() => {
         alert(`${winner} has won!`);
+        clearGame();
+      }, 50);
+    } else if (noneEmpty(gameState)) {
+      setTimeout(() => {
+        alert("Stalemate! Try again later");
         clearGame();
       }, 50);
     }
