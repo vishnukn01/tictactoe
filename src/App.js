@@ -7,16 +7,37 @@ function App() {
   const [gameState, setgameState] = useState(initialGameState);
 
   function handleSqaureClick(index) {
-    let gameStateArray = [...gameState];
-    gameStateArray[index] = isXTurn ? "X" : "O";
-    setgameState(gameStateArray);
-    setisXTurn(!isXTurn);
+    if (isXTurn) {
+      let gameStateArray = [...gameState];
+      gameStateArray[index] = "X";
+      setgameState(gameStateArray);
+      setisXTurn(false);
+    }
   }
 
   function clearGame() {
     setgameState(initialGameState);
     setisXTurn(true);
   }
+
+  useEffect(() => {
+    if (!isXTurn) {
+      let emptySpaces = [];
+      let gameStateArray = [...gameState];
+      gameStateArray.forEach((item, index) => {
+        if (item === "") {
+          emptySpaces.push(index);
+        }
+      });
+      let boxToFill =
+        emptySpaces[Math.floor(Math.random() * emptySpaces.length)];
+      gameStateArray[boxToFill] = "0";
+      setTimeout(() => {
+        setgameState(gameStateArray);
+        setisXTurn(true);
+      }, 1000);
+    }
+  }, [isXTurn]);
 
   useEffect(() => {
     const winner = checkWinner();
