@@ -22,20 +22,23 @@ function App() {
 
   useEffect(() => {
     if (!isXTurn) {
-      let emptySpaces = [];
-      let gameStateArray = [...gameState];
-      gameStateArray.forEach((item, index) => {
-        if (item === "") {
-          emptySpaces.push(index);
-        }
-      });
-      let boxToFill =
-        emptySpaces[Math.floor(Math.random() * emptySpaces.length)];
-      gameStateArray[boxToFill] = "0";
-      setTimeout(() => {
-        setgameState(gameStateArray);
-        setisXTurn(true);
-      }, 1000);
+      let winner = checkWinner();
+      if (winner === null) {
+        let emptySpaces = [];
+        let gameStateArray = [...gameState];
+        gameStateArray.forEach((item, index) => {
+          if (item === "") {
+            emptySpaces.push(index);
+          }
+        });
+        let boxToFill =
+          emptySpaces[Math.floor(Math.random() * emptySpaces.length)];
+        gameStateArray[boxToFill] = "0";
+        setTimeout(() => {
+          setgameState(gameStateArray);
+          setisXTurn(true);
+        }, 1000);
+      }
     }
   }, [isXTurn]);
 
@@ -86,7 +89,7 @@ function App() {
 
   return (
     <div className="app-header">
-      <p className="heading-text">Tic Tac Toe</p>
+      <p className="heading-text">Tic Tac Toe - Single Player</p>
       <div className="row jc-center">
         <SquareComponent
           className="b-bottom-right"
