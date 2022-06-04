@@ -31,13 +31,67 @@ function App() {
             emptySpaces.push(index);
           }
         });
-        let boxToFill =
-          emptySpaces[Math.floor(Math.random() * emptySpaces.length)];
-        gameStateArray[boxToFill] = "0";
-        setTimeout(() => {
-          setgameState(gameStateArray);
+        // select a random box to fill
+        const lines = [
+          [0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8],
+          [0, 3, 6],
+          [1, 4, 7],
+          [2, 5, 8],
+          [0, 4, 8],
+          [2, 4, 6],
+        ];
+        let performedMove = false;
+        for (let i = 0; i < lines.length; i++) {
+          const [a, b, c] = lines[i];
+          if (
+            gameState[a] === "X" &&
+            gameState[b] === "X" &&
+            gameState[c] === ""
+          ) {
+            console.log('gameState[a] === "X" && gameState[b] === "X"');
+            let updatedGameState = [...gameState];
+            updatedGameState[c] = "O";
+            setgameState(updatedGameState);
+            setisXTurn(true);
+            performedMove = true;
+            break;
+          } else if (
+            gameState[b] === "X" &&
+            gameState[c] === "X" &&
+            gameState[a] === ""
+          ) {
+            console.log('gameState[b] === "X" && gameState[c] === "X"');
+            let updatedGameState = [...gameState];
+            updatedGameState[a] = "O";
+            setgameState(updatedGameState);
+            setisXTurn(true);
+            performedMove = true;
+            break;
+          } else if (
+            gameState[a] === "X" &&
+            gameState[c] === "X" &&
+            gameState[a] === ""
+          ) {
+            console.log('gameState[a] === "X" && gameState[c] === "X"');
+            let updatedGameState = [...gameState];
+            updatedGameState[b] = "O";
+            setgameState(updatedGameState);
+            setisXTurn(true);
+            performedMove = true;
+            break;
+          }
+        }
+        if (!performedMove) {
+          console.log("filling in randomly");
+          let updatedGameState = [...gameState];
+          let boxToFill =
+            emptySpaces[Math.floor(Math.random() * emptySpaces.length)];
+          updatedGameState[boxToFill] = "O";
+          setgameState(updatedGameState);
           setisXTurn(true);
-        }, 1000);
+        }
       }
     }
   }, [isXTurn]);
@@ -57,13 +111,13 @@ function App() {
       }, 50);
     } else if (noneEmpty(gameState)) {
       setTimeout(() => {
-        alert("Stalemate! Try again later");
+        alert("Stalemate! Please try again");
         clearGame();
       }, 50);
     }
   }, [gameState]);
 
-  const checkWinner = () => {
+  function checkWinner() {
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -85,7 +139,7 @@ function App() {
       }
     }
     return null;
-  };
+  }
 
   return (
     <div className="app-header">
