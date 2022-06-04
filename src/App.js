@@ -3,25 +3,25 @@ import SquareComponent from "./components/SquareComponent";
 
 function App() {
   const initialGameState = ["", "", "", "", "", "", "", "", ""];
-  const [isXTurn, setisXTurn] = useState(true);
+  const [isUsersTurn, setisUsersTurn] = useState(true);
   const [gameState, setgameState] = useState(initialGameState);
 
   function handleSqaureClick(index) {
-    if (isXTurn) {
+    if (isUsersTurn && gameState[index] === "") {
       let gameStateArray = [...gameState];
       gameStateArray[index] = "X";
       setgameState(gameStateArray);
-      setisXTurn(false);
+      setisUsersTurn(false);
     }
   }
 
   function clearGame() {
     setgameState(initialGameState);
-    setisXTurn(true);
+    setisUsersTurn(true);
   }
 
   useEffect(() => {
-    if (!isXTurn) {
+    if (!isUsersTurn) {
       let winner = checkWinner();
       if (winner === null) {
         let emptySpaces = [];
@@ -54,7 +54,7 @@ function App() {
             let updatedGameState = [...gameState];
             updatedGameState[c] = "O";
             setgameState(updatedGameState);
-            setisXTurn(true);
+            setisUsersTurn(true);
             performedMove = true;
             break;
           } else if (
@@ -66,19 +66,19 @@ function App() {
             let updatedGameState = [...gameState];
             updatedGameState[a] = "O";
             setgameState(updatedGameState);
-            setisXTurn(true);
+            setisUsersTurn(true);
             performedMove = true;
             break;
           } else if (
             gameState[a] === "X" &&
             gameState[c] === "X" &&
-            gameState[a] === ""
+            gameState[b] === ""
           ) {
             console.log('gameState[a] === "X" && gameState[c] === "X"');
             let updatedGameState = [...gameState];
             updatedGameState[b] = "O";
             setgameState(updatedGameState);
-            setisXTurn(true);
+            setisUsersTurn(true);
             performedMove = true;
             break;
           }
@@ -90,11 +90,11 @@ function App() {
             emptySpaces[Math.floor(Math.random() * emptySpaces.length)];
           updatedGameState[boxToFill] = "O";
           setgameState(updatedGameState);
-          setisXTurn(true);
+          setisUsersTurn(true);
         }
       }
     }
-  }, [isXTurn]);
+  }, [isUsersTurn]);
 
   useEffect(() => {
     const winner = checkWinner();
@@ -105,15 +105,11 @@ function App() {
       return true;
     };
     if (winner) {
-      setTimeout(() => {
-        alert(`${winner} has won!`);
-        clearGame();
-      }, 50);
+      alert(`${winner} has won!`);
+      clearGame();
     } else if (noneEmpty(gameState)) {
-      setTimeout(() => {
-        alert("Stalemate! Please try again");
-        clearGame();
-      }, 50);
+      alert("Stalemate! Please try again");
+      clearGame();
     }
   }, [gameState]);
 
