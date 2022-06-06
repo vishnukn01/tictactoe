@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import SquareComponent from "./components/SquareComponent";
 
+/** ISSUES
+ * Stalemate message is showing before the final sqaure is filled
+ * **/
+
 function App() {
   const initialGameState = ["", "", "", "", "", "", "", "", ""];
   const [isUsersTurn, setisUsersTurn] = useState(true);
   const [gameState, setgameState] = useState(initialGameState);
+  const [isStalemate, setisStalemate] = useState(false);
 
   function handleSqaureClick(index) {
     if (isUsersTurn && gameState[index] === "") {
@@ -45,9 +50,16 @@ function App() {
   }
 
   useEffect(() => {
+    const noneEmpty = (arr) => {
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === "") return false;
+      }
+      return true;
+    };
     if (!isUsersTurn) {
       let winner = checkWinner();
-      if (winner === null) {
+      if (winner === null && !isStalemate) {
+        console.log("computers turn");
         let emptySpaces = [];
         let gameStateArray = [...gameState];
         gameStateArray.forEach((item, index) => {
@@ -107,7 +119,7 @@ function App() {
             break;
           }
         }
-        if (!performedMove) {
+        if (!performedMove && !noneEmpty(gameState)) {
           console.log("filling in randomly");
           let updatedGameState = [...gameState];
           let boxToFill =
@@ -121,6 +133,7 @@ function App() {
   }, [isUsersTurn]);
 
   useEffect(() => {
+    console.log("inside useEffect for gameState");
     const winner = checkWinner();
     const noneEmpty = (arr) => {
       for (var i = 0; i < arr.length; i++) {
@@ -129,19 +142,23 @@ function App() {
       return true;
     };
     if (winner) {
+      console.log("winner found");
       setTimeout(() => {
         alert(`${winner} has won!`);
         clearGame();
       }, 50);
     } else if (noneEmpty(gameState)) {
-      alert("Stalemate! Please try again");
-      clearGame();
+      setisStalemate(true);
+      setTimeout(() => {
+        alert("Stalemate! Better luck next time");
+        clearGame();
+      }, 50);
     }
   }, [gameState]);
 
   return (
     <div className="app-header">
-      <p className="heading-text">Tic Tac Toe - Single Player</p>
+      <p className="heading-text">Tic Tac Toe</p>
       <div className="row jc-center">
         <SquareComponent
           className="b-bottom-right"
