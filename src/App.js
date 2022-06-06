@@ -128,7 +128,9 @@ function App() {
     const winner = checkWinner();
     if (winner) {
       setTimeout(() => {
-        alert(`${winner} has won!`);
+        let alertMsg =
+          winner === "X" ? "You win!" : "You lost! Better luck next time";
+        alert(alertMsg);
         clearGame();
       }, 50);
     } else if (noneEmpty(gameState)) {
@@ -212,7 +214,7 @@ function App() {
         />
       </div>
       <button className="clear-button" onClick={clearGame}>
-        Clear game
+        Clear Game
       </button>
     </div>
   );
