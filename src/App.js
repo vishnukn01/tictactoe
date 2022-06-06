@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SquareComponent from "./components/SquareComponent";
 
-/** ISSUES
- * Stalemate message is showing before the final sqaure is filled
- * **/
-
 function App() {
   const initialGameState = ["", "", "", "", "", "", "", "", ""];
   const [isUsersTurn, setisUsersTurn] = useState(true);
@@ -46,20 +42,21 @@ function App() {
 
   function clearGame() {
     setgameState(initialGameState);
+    setisStalemate(false);
     setisUsersTurn(true);
   }
 
+  function noneEmpty(arr) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] === "") return false;
+    }
+    return true;
+  }
+
   useEffect(() => {
-    const noneEmpty = (arr) => {
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i] === "") return false;
-      }
-      return true;
-    };
     if (!isUsersTurn) {
       let winner = checkWinner();
       if (winner === null && !isStalemate) {
-        console.log("computers turn");
         let emptySpaces = [];
         let gameStateArray = [...gameState];
         gameStateArray.forEach((item, index) => {
@@ -67,7 +64,6 @@ function App() {
             emptySpaces.push(index);
           }
         });
-        // select a random box to fill
         const lines = [
           [0, 1, 2],
           [3, 4, 5],
@@ -86,7 +82,6 @@ function App() {
             gameState[b] === "X" &&
             gameState[c] === ""
           ) {
-            console.log('gameState[a] === "X" && gameState[b] === "X"');
             let updatedGameState = [...gameState];
             updatedGameState[c] = "O";
             setgameState(updatedGameState);
@@ -98,7 +93,6 @@ function App() {
             gameState[c] === "X" &&
             gameState[a] === ""
           ) {
-            console.log('gameState[b] === "X" && gameState[c] === "X"');
             let updatedGameState = [...gameState];
             updatedGameState[a] = "O";
             setgameState(updatedGameState);
@@ -110,7 +104,6 @@ function App() {
             gameState[c] === "X" &&
             gameState[b] === ""
           ) {
-            console.log('gameState[a] === "X" && gameState[c] === "X"');
             let updatedGameState = [...gameState];
             updatedGameState[b] = "O";
             setgameState(updatedGameState);
@@ -120,7 +113,6 @@ function App() {
           }
         }
         if (!performedMove && !noneEmpty(gameState)) {
-          console.log("filling in randomly");
           let updatedGameState = [...gameState];
           let boxToFill =
             emptySpaces[Math.floor(Math.random() * emptySpaces.length)];
@@ -133,16 +125,8 @@ function App() {
   }, [isUsersTurn]);
 
   useEffect(() => {
-    console.log("inside useEffect for gameState");
     const winner = checkWinner();
-    const noneEmpty = (arr) => {
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i] === "") return false;
-      }
-      return true;
-    };
     if (winner) {
-      console.log("winner found");
       setTimeout(() => {
         alert(`${winner} has won!`);
         clearGame();
