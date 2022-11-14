@@ -3,43 +3,20 @@ import SquareComponent from "./components/SquareComponent";
 
 function App() {
   const initialGameState = ["", "", "", "", "", "", "", "", ""];
-  const [isXTurn, setisXTurn] = useState(true);
+  const [isUsersTurn, setisUsersTurn] = useState(true);
   const [gameState, setgameState] = useState(initialGameState);
+  const [isStalemate, setisStalemate] = useState(false);
 
   function handleSqaureClick(index) {
-    let gameStateArray = [...gameState];
-    gameStateArray[index] = isXTurn ? "X" : "O";
-    setgameState(gameStateArray);
-    setisXTurn(!isXTurn);
-  }
-
-  function clearGame() {
-    setgameState(initialGameState);
-    setisXTurn(true);
-  }
-
-  useEffect(() => {
-    const winner = checkWinner();
-    const noneEmpty = (arr) => {
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i] === "") return false;
-      }
-      return true;
-    };
-    if (winner) {
-      setTimeout(() => {
-        alert(`${winner} has won!`);
-        clearGame();
-      }, 50);
-    } else if (noneEmpty(gameState)) {
-      setTimeout(() => {
-        alert("Stalemate! Try again later");
-        clearGame();
-      }, 50);
+    if (isUsersTurn && gameState[index] === "") {
+      let gameStateArray = [...gameState];
+      gameStateArray[index] = "X";
+      setgameState(gameStateArray);
+      setisUsersTurn(false);
     }
-  }, [gameState]);
+  }
 
-  const checkWinner = () => {
+  function checkWinner() {
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -61,7 +38,109 @@ function App() {
       }
     }
     return null;
-  };
+  }
+
+  function clearGame() {
+    setgameState(initialGameState);
+    setisStalemate(false);
+    setisUsersTurn(true);
+  }
+
+  function noneEmpty(arr) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] === "") return false;
+    }
+    return true;
+  }
+
+  useEffect(() => {
+    if (!isUsersTurn) {
+      let winner = checkWinner();
+      if (winner === null && !isStalemate) {
+        let emptySpaces = [];
+        let gameStateArray = [...gameState];
+        gameStateArray.forEach((item, index) => {
+          if (item === "") {
+            emptySpaces.push(index);
+          }
+        });
+        const lines = [
+          [0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8],
+          [0, 3, 6],
+          [1, 4, 7],
+          [2, 5, 8],
+          [0, 4, 8],
+          [2, 4, 6],
+        ];
+        let performedMove = false;
+        for (let i = 0; i < lines.length; i++) {
+          const [a, b, c] = lines[i];
+          if (
+            gameState[a] === "X" &&
+            gameState[b] === "X" &&
+            gameState[c] === ""
+          ) {
+            let updatedGameState = [...gameState];
+            updatedGameState[c] = "O";
+            setgameState(updatedGameState);
+            setisUsersTurn(true);
+            performedMove = true;
+            break;
+          } else if (
+            gameState[b] === "X" &&
+            gameState[c] === "X" &&
+            gameState[a] === ""
+          ) {
+            let updatedGameState = [...gameState];
+            updatedGameState[a] = "O";
+            setgameState(updatedGameState);
+            setisUsersTurn(true);
+            performedMove = true;
+            break;
+          } else if (
+            gameState[a] === "X" &&
+            gameState[c] === "X" &&
+            gameState[b] === ""
+          ) {
+            let updatedGameState = [...gameState];
+            updatedGameState[b] = "O";
+            setgameState(updatedGameState);
+            setisUsersTurn(true);
+            performedMove = true;
+            break;
+          }
+        }
+        if (!performedMove && !noneEmpty(gameState)) {
+          let updatedGameState = [...gameState];
+          let boxToFill =
+            emptySpaces[Math.floor(Math.random() * emptySpaces.length)];
+          updatedGameState[boxToFill] = "O";
+          setgameState(updatedGameState);
+          setisUsersTurn(true);
+        }
+      }
+    }
+  }, [isUsersTurn]);
+
+  useEffect(() => {
+    const winner = checkWinner();
+    if (winner) {
+      setTimeout(() => {
+        let alertMsg =
+          winner === "X" ? "You win!" : "You lost! Better luck next time";
+        alert(alertMsg);
+        clearGame();
+      }, 50);
+    } else if (noneEmpty(gameState)) {
+      setisStalemate(true);
+      setTimeout(() => {
+        alert("Stalemate! Better luck next time");
+        clearGame();
+      }, 50);
+    }
+  }, [gameState]);
 
   return (
     <div className="app-header">
@@ -135,7 +214,7 @@ function App() {
         />
       </div>
       <button className="clear-button" onClick={clearGame}>
-        Clear game
+        Clear Game
       </button>
     </div>
   );
